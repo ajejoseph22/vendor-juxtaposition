@@ -1,22 +1,38 @@
-import React, { FC, useState } from "react";
+import React, { createContext, FC, ReactNode, useState } from "react";
 import "./App.css";
 import { Menu, Button, Dropdown, Descriptions } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import google from "./assets/google.png";
 import produce from "immer";
+import AddNewVendorModal from "./components/modals/add-new-vendor";
+import CompanyName from "./components/company-name";
+
+//////// TYPES /////////
+interface IColumns {
+  [key: string]: any;
+}
+
+////////////////////////
+
+//////// CONTEXT /////////
+export const VendorContext = createContext({
+  add: (formValue: { [key: string]: any }) => {},
+  cancel: () => {},
+  remove: (i: string) => {},
+  columns: {},
+});
+export const CriteriaContext = createContext({
+  add: () => {},
+  cancel: () => {},
+});
+
+//////////////////////////
 
 const App: FC = () => {
-  const initialData = [
-    {
+  const initialData = {
+    DropBox: {
       key: "1",
       image: "dropbox",
-      company: (
-        <div>
-          <img alt="google" src={google} height={50} width={50} />
-          <br />
-          DropBox
-        </div>
-      ),
+      company: <CompanyName name="DropBox" />,
       productDescription: "something",
       overallScore: 6,
       fundingHistory: {},
@@ -24,64 +40,58 @@ const App: FC = () => {
       features: "5 different features present",
       customerCaseStudies: "4 customer case studies",
     },
-    {
+    "Google Drive": {
       key: "2",
       image: "googledrive",
       productDescription: "another thing",
-      company: (
-        <div>
-          <img alt="google" src={google} height={50} width={50} />
-          <br />
-          Google Drive
-        </div>
-      ),
+      company: <CompanyName name="Google Drive" />,
       overallScore: 7,
       fundingHistory: {},
       pricing: "www.drive.google.com/pricing",
       features: "4 different features present",
       customerCaseStudies: "6 customer case studies",
     },
-    {
+    SalesForce: {
       key: "3",
       image: "salesforce",
       productDescription: "product desc",
-      company: (
-        <div>
-          <img alt="google" src={google} height={50} width={50} />
-          <br />
-          SalesForce
-        </div>
-      ),
+      company: <CompanyName name="SalesForce" />,
       overallScore: 8,
       fundingHistory: {},
       pricing: "www.salesforce.com/pricing",
       features: "6 different features present",
       customerCaseStudies: "1 customer case studies",
     },
-  ];
+  };
+
   const initialColumns = {
     company: (
       <p
         onClick={() => {
           // Show Modal
-          setData(
-            produce((draft) => {
-              draft.push({});
-            })
-          );
+          setShowAddVendorModal(true);
+          // setData(
+          //   produce((draft) => {
+          //     draft.push({});
+          //   })
+          // );
         }}
       >
         Add new vendor
       </p>
     ),
-    overallScore: "overall score",
-    productDescription: "product description",
-    pricing: "pricing",
-    customerCaseStudies: "customer case studies",
+    overallScore: "Overall score",
+    productDescription: "Product description",
+    pricing: "Pricing",
+    customerCaseStudies: "Customer case studies",
   };
+  /////////////////////
 
-  const [data, setData] = useState<any[]>(initialData);
-  const [columns, setColumns] = useState<{ [key: string]: any }>(initialColumns);
+  /////// STATE ///////
+  const [data, setData] = useState<IColumns>(initialData);
+  const [columns, setColumns] = useState<IColumns>(initialColumns);
+  const [showAddVendorModal, setShowAddVendorModal] = useState(false);
+  ////////////////////
 
   const menu = (
     <Menu onClick={() => {}}>
@@ -98,16 +108,16 @@ const App: FC = () => {
   );
 
   const display = Object.keys(columns).map((column) =>
-    data.reduce((acc, item, idx) => {
+    Object.keys(data).reduce((acc: ReactNode[], item, idx) => {
       if (!idx) {
         acc.push(
           <Descriptions.Item label={columns[column]} key={idx}>
-            {item[column]}
+            {data[item][column]}
           </Descriptions.Item>
         );
       } else {
         acc.push(
-          <Descriptions.Item key={idx}>{item[column]}</Descriptions.Item>
+          <Descriptions.Item key={idx}>{data[item][column]}</Descriptions.Item>
         );
       }
       return acc;
@@ -115,20 +125,59 @@ const App: FC = () => {
   );
 
   return (
-    <div className="App">
-      <Descriptions
-        title={
-          <Dropdown overlay={menu}>
-            <Button>
-              Add new criteria <DownOutlined />
-            </Button>
-          </Dropdown>
-        }
-        bordered
+    <VendorContext.Provider
+      value={{
+        add: (formValue) => {
+          setData(
+            produce((draft) => {
+              draft[formValue.company] = {
+                ...formValue,
+                company: <CompanyName name={formValue.company} />,
+              };
+            })
+          );
+
+          setShowAddVendorModal(false);
+        },
+        cancel: () => setShowAddVendorModal(false),
+        remove: (name) => {
+          setData(
+            produce((draft) => {
+              delete draft[name];
+            })
+          );
+        },
+        columns: columns,
+      }}
+    >
+      <CriteriaContext.Provider
+        value={{
+          add: () => {
+            console.log("criteria added");
+          },
+          cancel: () => {
+            console.log("criteria cancelled");
+          },
+        }}
       >
-        {display}
-      </Descriptions>
-    </div>
+        <div className="App">
+          <AddNewVendorModal showModal={showAddVendorModal} />
+          <Descriptions
+            title={
+              <Dropdown overlay={menu}>
+                <Button>
+                  Add new criteria <DownOutlined />
+                </Button>
+              </Dropdown>
+            }
+            column={Object.keys(data).length}
+            bordered
+          >
+            {display}
+          </Descriptions>
+        </div>
+      </CriteriaContext.Provider>
+    </VendorContext.Provider>
   );
 };
 
