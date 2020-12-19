@@ -1,13 +1,15 @@
 import React, { createContext, FC, ReactNode, useState } from "react";
 import "./App.css";
-import { Menu, Button, Dropdown, Descriptions } from "antd";
+import { Menu, Button, Dropdown, Descriptions, Input } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import produce from "immer";
 import AddNewVendorModal from "./components/modals/add-new-vendor";
 import CompanyName from "./components/company-name";
+import { camelize } from "./utils/methods";
+import AddNewCriteriaModal from "./components/modals/add-new-criteria";
 
 //////// TYPES /////////
-interface IColumns {
+interface IObject {
   [key: string]: any;
 }
 
@@ -15,13 +17,13 @@ interface IColumns {
 
 //////// CONTEXT /////////
 export const VendorContext = createContext({
-  add: (formValue: { [key: string]: any }) => {},
+  add: (formValue: IObject) => {},
   cancel: () => {},
   remove: (i: string) => {},
   columns: {},
 });
 export const CriteriaContext = createContext({
-  add: () => {},
+  add: (criterium: string) => {},
   cancel: () => {},
 });
 
@@ -88,36 +90,27 @@ const App: FC = () => {
   /////////////////////
 
   /////// STATE ///////
-  const [data, setData] = useState<IColumns>(initialData);
-  const [columns, setColumns] = useState<IColumns>(initialColumns);
+  const [data, setData] = useState<IObject>(initialData);
+  const [columns, setColumns] = useState<IObject>(initialColumns);
   const [showAddVendorModal, setShowAddVendorModal] = useState(false);
+  const [showAddCriteriaModal, setShowAddCriteriaModal] = useState(false);
   ////////////////////
 
-  const menu = (
-    <Menu onClick={() => {}}>
-      <Menu.Item key="1" icon={<UserOutlined />}>
-        1st menu item
-      </Menu.Item>
-      <Menu.Item key="2" icon={<UserOutlined />}>
-        2nd menu item
-      </Menu.Item>
-      <Menu.Item key="3" icon={<UserOutlined />}>
-        3rd menu item
-      </Menu.Item>
-    </Menu>
-  );
+  const menu = <Input size="small" placeholder="Enter the Criterium" />;
 
   const display = Object.keys(columns).map((column) =>
     Object.keys(data).reduce((acc: ReactNode[], item, idx) => {
       if (!idx) {
         acc.push(
           <Descriptions.Item label={columns[column]} key={idx}>
-            {data[item][column]}
+            {data[item][column] || "-"}
           </Descriptions.Item>
         );
       } else {
         acc.push(
-          <Descriptions.Item key={idx}>{data[item][column]}</Descriptions.Item>
+          <Descriptions.Item key={idx}>
+            {data[item][column] || "-"}
+          </Descriptions.Item>
         );
       }
       return acc;
@@ -152,23 +145,26 @@ const App: FC = () => {
     >
       <CriteriaContext.Provider
         value={{
-          add: () => {
-            console.log("criteria added");
+          add: (criteria) => {
+            setColumns(
+              produce((draft) => {
+                draft[camelize(criteria)] = criteria;
+              })
+            );
+
+            setShowAddCriteriaModal(false);
           },
-          cancel: () => {
-            console.log("criteria cancelled");
-          },
+          cancel: () => setShowAddCriteriaModal(false),
         }}
       >
         <div className="App">
           <AddNewVendorModal showModal={showAddVendorModal} />
+          <AddNewCriteriaModal showModal={showAddCriteriaModal} />
           <Descriptions
             title={
-              <Dropdown overlay={menu}>
-                <Button>
-                  Add new criteria <DownOutlined />
-                </Button>
-              </Dropdown>
+              <Button onClick={() => setShowAddCriteriaModal(true)}>
+                Add new criteria <DownOutlined />
+              </Button>
             }
             column={Object.keys(data).length}
             bordered
