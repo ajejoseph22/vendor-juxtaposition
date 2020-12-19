@@ -1,7 +1,7 @@
 import React, { createContext, FC, ReactNode, useState } from "react";
 import "./App.css";
-import { Menu, Button, Dropdown, Descriptions, Input } from "antd";
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Descriptions } from "antd";
+import { CloseCircleOutlined, DownOutlined } from "@ant-design/icons";
 import produce from "immer";
 import AddNewVendorModal from "./components/modals/add-new-vendor";
 import CompanyName from "./components/company-name";
@@ -96,14 +96,42 @@ const App: FC = () => {
   const [showAddCriteriaModal, setShowAddCriteriaModal] = useState(false);
   ////////////////////
 
-  const menu = <Input size="small" placeholder="Enter the Criterium" />;
-
-  const display = Object.keys(columns).map((column) =>
+  const display = Object.keys(columns).map((column, i) =>
     Object.keys(data).reduce((acc: ReactNode[], item, idx) => {
       if (!idx) {
         acc.push(
-          <Descriptions.Item label={columns[column]} key={idx}>
-            {data[item][column] || "-"}
+          <Descriptions.Item
+            label={
+              <p>
+                {columns[column]}{" "}
+                {i ? (
+                  <CloseCircleOutlined
+                    onClick={() => {
+                      setColumns(
+                        produce((draft) => {
+                          delete draft[column];
+                        })
+                      );
+                      setData(
+                        produce((draft) => {
+                          Object.keys(draft).forEach((item) => {
+                            delete draft[item][column];
+                          });
+                        })
+                      );
+                    }}
+                    style={{
+                      background: "red",
+                      color: "#fff",
+                      borderRadius: 50,
+                    }}
+                  />
+                ) : null}
+              </p>
+            }
+            key={idx}
+          >
+            {data[item][column] || "-"}{" "}
           </Descriptions.Item>
         );
       } else {
