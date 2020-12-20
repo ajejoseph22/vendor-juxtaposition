@@ -1,11 +1,21 @@
-import React, { createContext, FC, ReactNode, useState } from "react";
+import React, {
+  createContext,
+  FC,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import "./App.css";
-import { Button, Descriptions } from "antd";
-import { CloseCircleOutlined, DownOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Progress } from "antd";
+import {
+  CloseCircleOutlined,
+  DownOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
 import produce from "immer";
 import AddNewVendorModal from "./components/modals/add-new-vendor";
 import CompanyName from "./components/company-name";
-import { camelize } from "./utils/methods";
+import { addToObject, camelize } from "./utils/methods";
 import AddNewCriteriaModal from "./components/modals/add-new-criteria";
 
 //////// TYPES /////////
@@ -32,23 +42,26 @@ export const CriteriaContext = createContext({
 const App: FC = () => {
   const initialData = {
     DropBox: {
-      key: "1",
       image: "dropbox",
       company: <CompanyName name="DropBox" />,
       productDescription: "something",
-      overallScore: 6,
-      fundingHistory: {},
+      overallScore: <Progress type="circle" percent={60} />,
+      fundingHistory: [150, 2005, "DFG,Scale Ventures Partners", "Aeron Levie"],
       pricing: "www.dropbox.com/pricing",
       features: "5 different features present",
       customerCaseStudies: "4 customer case studies",
     },
     "Google Drive": {
-      key: "2",
       image: "googledrive",
       productDescription: "another thing",
       company: <CompanyName name="Google Drive" />,
-      overallScore: 7,
-      fundingHistory: {},
+      overallScore: <Progress type="circle" percent={70} />,
+      fundingHistory: [
+        36.1,
+        2007,
+        "ACT, Achieve Ventures & Capital",
+        "Arash Ferdoswi",
+      ],
       pricing: "www.drive.google.com/pricing",
       features: "4 different features present",
       customerCaseStudies: "6 customer case studies",
@@ -58,8 +71,14 @@ const App: FC = () => {
       image: "salesforce",
       productDescription: "product desc",
       company: <CompanyName name="SalesForce" />,
-      overallScore: 8,
-      fundingHistory: {},
+      overallScore: <Progress type="circle" percent={80} />,
+      fundingHistory: [
+        756.1,
+        2009,
+        "Sequia, Larry Page",
+        "Kleiner, Sergey Bin",
+      ],
+
       pricing: "www.salesforce.com/pricing",
       features: "6 different features present",
       customerCaseStudies: "1 customer case studies",
@@ -68,23 +87,23 @@ const App: FC = () => {
 
   const initialColumns = {
     company: (
-      <p
+      <div
         onClick={() => {
-          // Show Modal
           setShowAddVendorModal(true);
-          // setData(
-          //   produce((draft) => {
-          //     draft.push({});
-          //   })
-          // );
         }}
+        style={{ cursor: "pointer", position: "relative" }}
       >
-        Add new vendor
-      </p>
+        <PlusSquareOutlined style={{ color: "green" }} />
+        <p className={"add-new-vendor-txt"}>Add new vendor</p>
+      </div>
     ),
     overallScore: "Overall score",
     productDescription: "Product description",
     pricing: "Pricing",
+    fundingHistory: "Funding History",
+    founded: "Founded",
+    keyInvestors: "Key Investors",
+    founders: "Founders",
     customerCaseStudies: "Customer case studies",
   };
   /////////////////////
@@ -94,8 +113,47 @@ const App: FC = () => {
   const [columns, setColumns] = useState<IObject>(initialColumns);
   const [showAddVendorModal, setShowAddVendorModal] = useState(false);
   const [showAddCriteriaModal, setShowAddCriteriaModal] = useState(false);
+  const [showFundingHistory, setShowFundingHistory] = useState(false);
   ////////////////////
 
+  useEffect(() => {
+    if (showFundingHistory) {
+      let index = Object.keys(columns).findIndex(
+        (item) => item === "fundingHistory"
+      );
+      let newColumns = { ...columns };
+
+      newColumns = addToObject(newColumns, "founded", "Founded", ++index);
+      newColumns = addToObject(
+        newColumns,
+        "keyInvestors",
+        "Key Investors",
+        ++index
+      );
+      newColumns = addToObject(newColumns, "founders", "Founders", ++index);
+      setColumns(newColumns);
+      return;
+    }
+
+    setColumns(
+      produce((draft) => {
+        delete draft.founded;
+        delete draft.founders;
+        delete draft.keyInvestors;
+      })
+    );
+  }, [showFundingHistory]);
+
+  enum FundingHistoryMap {
+    amount,
+    founded,
+    keyInvestors,
+    founders,
+  }
+
+  const toFundingText = (amount: string) => `Total funding: $${amount}m`;
+  const isFundingHisoryData = (key: string): boolean =>
+    ["founded", "founders", "keyInvestors"].includes(key);
   const display = Object.keys(columns).map((column, i) =>
     Object.keys(data).reduce((acc: ReactNode[], item, idx) => {
       if (!idx) {
@@ -103,7 +161,23 @@ const App: FC = () => {
           <Descriptions.Item
             label={
               <p>
-                {columns[column]}{" "}
+                {Object.keys(data).length === 4 && column === "company" ? (
+                  <p style={{ width: 210 }}>
+                    A maximum of 4 vendors is allowed. Please delete a vendor
+                    before adding a new one{" "}
+                  </p>
+                ) : column !== "fundingHistory" ? (
+                  columns[column]
+                ) : (
+                  <>
+                    <span
+                      onClick={() => setShowFundingHistory(!showFundingHistory)}
+                      style={{ fontWeight: "bold", cursor: "pointer" }}
+                    >
+                      {columns[column]}
+                    </span>
+                  </>
+                )}{" "}
                 {i ? (
                   <CloseCircleOutlined
                     onClick={() => {
@@ -131,13 +205,21 @@ const App: FC = () => {
             }
             key={idx}
           >
-            {data[item][column] || "-"}{" "}
+            {isFundingHisoryData(column)
+              ? data[item]["fundingHistory"][FundingHistoryMap[column]]
+              : column !== "fundingHistory"
+              ? data[item][column] || "-"
+              : toFundingText(data[item][column][0])}
           </Descriptions.Item>
         );
       } else {
         acc.push(
           <Descriptions.Item key={idx}>
-            {data[item][column] || "-"}
+            {isFundingHisoryData(column)
+              ? data[item]["fundingHistory"][FundingHistoryMap[column]]
+              : column !== "fundingHistory"
+              ? data[item][column] || "-"
+              : toFundingText(data[item][column][0])}
           </Descriptions.Item>
         );
       }
@@ -151,9 +233,23 @@ const App: FC = () => {
         add: (formValue) => {
           setData(
             produce((draft) => {
+              console.log(formValue);
+              debugger;
               draft[formValue.company] = {
                 ...formValue,
                 company: <CompanyName name={formValue.company} />,
+                overallScore: (
+                  <Progress
+                    type="circle"
+                    percent={formValue.overallScore * 10}
+                  />
+                ),
+                fundingHistory: [
+                  formValue.fundingHistory,
+                  formValue.founded,
+                  formValue.keyInvestors,
+                  formValue.founders,
+                ],
               };
             })
           );
@@ -190,7 +286,13 @@ const App: FC = () => {
           <AddNewCriteriaModal showModal={showAddCriteriaModal} />
           <Descriptions
             title={
-              <Button onClick={() => setShowAddCriteriaModal(true)}>
+              <Button
+                style={{
+                  float: "left",
+                  border: "none",
+                }}
+                onClick={() => setShowAddCriteriaModal(true)}
+              >
                 Add new criteria <DownOutlined />
               </Button>
             }

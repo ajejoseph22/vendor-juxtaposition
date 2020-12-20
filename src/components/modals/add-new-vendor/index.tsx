@@ -16,7 +16,10 @@ const AddNewVendorModal: FC<{ showModal: boolean }> = ({ showModal }) => {
             add(formValue);
             setFormValue({});
           }}
-          onCancel={cancel}
+          onCancel={() => {
+            cancel();
+            setFormValue({});
+          }}
           okButtonProps={{ disabled: false }}
           cancelButtonProps={{ disabled: false }}
         >
@@ -34,7 +37,11 @@ const AddNewVendorModal: FC<{ showModal: boolean }> = ({ showModal }) => {
                       );
                     }}
                     key={index}
-                    placeholder={columns[column]}
+                    placeholder={
+                      column === "fundingHistory"
+                        ? "Total amount"
+                        : columns[column]
+                    }
                   />
                 );
               }
@@ -62,5 +69,4 @@ const AddNewVendorModal: FC<{ showModal: boolean }> = ({ showModal }) => {
     </VendorContext.Consumer>
   );
 };
-
 export default AddNewVendorModal;

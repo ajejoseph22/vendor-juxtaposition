@@ -38,6 +38,31 @@
   }
 }
 
-.ant-btn.ant-dropdown-trigger {
-  float: left;
+.ant-descriptions.ant-descriptions-bordered {
+  box-shadow: 0 5px 15px 0 rgba(153, 153, 153, 0.5);
+}
+
+.ant-descriptions-header {
+  margin-bottom: 0;
+}
+
+.ant-progress-inner {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 12px !important;
+}
+
+.add-new-vendor-txt {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+}
+
+span.anticon-plus-square {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
