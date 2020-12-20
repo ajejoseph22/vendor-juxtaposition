@@ -56,8 +56,6 @@ const AddNewVendorModal: FC<{ showModal: boolean }> = ({ showModal }) => {
                       draft.company = e.target.value;
                     })
                   );
-
-                  console.log(formValue["company"]);
                 }}
                 key={0}
                 placeholder="Company name"

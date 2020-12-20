@@ -42,8 +42,7 @@ export const CriteriaContext = createContext({
 const App: FC = () => {
   const initialData = {
     DropBox: {
-      image: "dropbox",
-      company: <CompanyName name="DropBox" />,
+      company: <CompanyName name="DropBox" image="dropbox" />,
       productDescription: "something",
       overallScore: <Progress type="circle" percent={60} />,
       fundingHistory: [150, 2005, "DFG,Scale Ventures Partners", "Aeron Levie"],
@@ -52,9 +51,8 @@ const App: FC = () => {
       customerCaseStudies: "4 customer case studies",
     },
     "Google Drive": {
-      image: "googledrive",
       productDescription: "another thing",
-      company: <CompanyName name="Google Drive" />,
+      company: <CompanyName name="Google Drive" image="google" />,
       overallScore: <Progress type="circle" percent={70} />,
       fundingHistory: [
         36.1,
@@ -67,10 +65,8 @@ const App: FC = () => {
       customerCaseStudies: "6 customer case studies",
     },
     SalesForce: {
-      key: "3",
-      image: "salesforce",
       productDescription: "product desc",
-      company: <CompanyName name="SalesForce" />,
+      company: <CompanyName name="SalesForce" image="salesforce" />,
       overallScore: <Progress type="circle" percent={80} />,
       fundingHistory: [
         756.1,
@@ -233,8 +229,6 @@ const App: FC = () => {
         add: (formValue) => {
           setData(
             produce((draft) => {
-              console.log(formValue);
-              debugger;
               draft[formValue.company] = {
                 ...formValue,
                 company: <CompanyName name={formValue.company} />,

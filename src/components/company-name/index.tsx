@@ -1,8 +1,18 @@
 import google from "../../assets/google.png";
+import dropbox from "../../assets/dropbox.png";
+import salesforce from "../../assets/salesforce.png";
+import defaultLogo from "../../assets/defaultLogo.png";
 import React, { FC } from "react";
 import { VendorContext } from "../../App";
 
-const CompanyName: FC<{ name: string }> = ({ name }) => (
+const logoNameMap = {
+  google,
+  salesforce,
+  dropbox,
+  defaultLogo,
+};
+
+const CompanyName: FC<{ name: string; image?: string }> = ({ name, image }) => (
   <VendorContext.Consumer>
     {({ remove }) => (
       <div>
@@ -12,7 +22,12 @@ const CompanyName: FC<{ name: string }> = ({ name }) => (
         >
           x
         </p>
-        <img alt="google" src={google} height={50} width={50} />
+        <img
+          alt={image}
+          src={logoNameMap[image || 'defaultLogo']}
+          height={50}
+          width={50}
+        />
         <br />
         {name}
       </div>
