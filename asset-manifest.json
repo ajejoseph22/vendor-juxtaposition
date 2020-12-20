@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/vendor-juxtaposition/static/css/main.db850b70.chunk.css",
+    "main.js": "/vendor-juxtaposition/static/js/main.4a3a12cf.chunk.js",
+    "main.js.map": "/vendor-juxtaposition/static/js/main.4a3a12cf.chunk.js.map",
+    "runtime-main.js": "/vendor-juxtaposition/static/js/runtime-main.e4200375.js",
+    "runtime-main.js.map": "/vendor-juxtaposition/static/js/runtime-main.e4200375.js.map",
+    "static/css/2.4d98ed14.chunk.css": "/vendor-juxtaposition/static/css/2.4d98ed14.chunk.css",
+    "static/js/2.651d590c.chunk.js": "/vendor-juxtaposition/static/js/2.651d590c.chunk.js",
+    "static/js/2.651d590c.chunk.js.map": "/vendor-juxtaposition/static/js/2.651d590c.chunk.js.map",
+    "static/js/3.242f322c.chunk.js": "/vendor-juxtaposition/static/js/3.242f322c.chunk.js",
+    "static/js/3.242f322c.chunk.js.map": "/vendor-juxtaposition/static/js/3.242f322c.chunk.js.map",
+    "index.html": "/vendor-juxtaposition/index.html",
+    "static/css/2.4d98ed14.chunk.css.map": "/vendor-juxtaposition/static/css/2.4d98ed14.chunk.css.map",
+    "static/css/main.db850b70.chunk.css.map": "/vendor-juxtaposition/static/css/main.db850b70.chunk.css.map",
+    "static/js/2.651d590c.chunk.js.LICENSE.txt": "/vendor-juxtaposition/static/js/2.651d590c.chunk.js.LICENSE.txt",
+    "static/media/dropbox.130feb93.png": "/vendor-juxtaposition/static/media/dropbox.130feb93.png",
+    "static/media/google.6bc7d493.png": "/vendor-juxtaposition/static/media/google.6bc7d493.png",
+    "static/media/salesforce.07b8df27.png": "/vendor-juxtaposition/static/media/salesforce.07b8df27.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.e4200375.js",
+    "static/css/2.4d98ed14.chunk.css",
+    "static/js/2.651d590c.chunk.js",
+    "static/css/main.db850b70.chunk.css",
+    "static/js/main.4a3a12cf.chunk.js"
+  ]
+}
